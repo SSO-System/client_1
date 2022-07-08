@@ -38,7 +38,6 @@ export default () => ({
         })
       }
       try {
-        console.log(req.query);
         const session = req.cookies._app_session;
         const data: any = await db.collection('app_session').doc(session).get();
 
