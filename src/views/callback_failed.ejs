@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <%- include('components/head'); -%>
+  <body class="app">    
+    <div>      
+        <img src="https://firebasestorage.googleapis.com/v0/b/oauth2-c28ca.appspot.com/o/access%20denied.png?alt=media&token=57f1806f-77a6-4f58-a496-e32174b7f06d" width="250px" height="250px" style="display: block; margin: auto;"/>
+    </div>
+    <div style="text-align: center;">
+      <h1> <%= error.split('_').map(x => x[0].toUpperCase() + x.slice(1)).join(' ') %></h1>
+      <p> <%= errorDescription %> </p>
+    </div> 
+    <button class="login login-submit" style="display: block; margin: auto;" onclick="backToHome();"> Back to home </button>
+    <script>
+      function backToHome() {
+        window.location.href = "<%= appUrl %>";
+      }
+    </script>
+  </body>
+</html>

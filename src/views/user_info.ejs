@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <%- include('components/head'); -%>
+  <body class="app">    
+    <div>      
+      <img id="avatar" src="https://firebasestorage.googleapis.com/v0/b/oauth2-c28ca.appspot.com/o/avatar%2Fdefault_picture.jpg?alt=media&token=bbd9a270-6ed9-4e70-92cb-2aa12713439c" width="120px" height="120px" style="border-radius: 25px; display: block; margin: auto;">
+    </div>
+    <div style="text-align: center; width: 400px; margin: auto;">
+      <p style="font-weight: bold; font-size: 25px;"> <%= firstname %> <%= lastname %> </p>
+      <p style="text-align: left;"> Email: 
+        <span>
+          <%= email %>
+        </span>
+      </p>
+      <p style="text-align: left;"> Gender: 
+        <span> 
+          <% if (gender === "male") { %>  
+            Male
+          <% } else { %>
+            Female
+          <% } %>
+        </span> 
+      </p>
+      <p style="text-align: left"> Birthdate: 
+        <span> <%= (new Date(birthdate)).toLocaleDateString('vi'); %> </span>
+      </p>
+      <p style="text-align: right; font-size: 15px; font-style: italic;"> Created Date: 
+        <span> 
+          <%= (new Date(createdAt)).toLocaleString('vi'); %> 
+        </span>
+      </p>
+    </div>
+    <div>
+      <form action="<%= authServerUrl %>/session/end" method="post">
+        <input hidden required name="client_id", value="<%= clientId %>"/>
+        <input hidden required name="id_token_hint" value="<%= idToken %>"/>
+        <input hidden required name="post_logout_redirect_uri" value="<%= appUrl %>/logout_callback" />
+        <button class="login login-submit" style="display: block; margin: auto;" type="submit"> Logout </button>
+      </form>
+    </div>
+    <script>
+      document.getElementById('avatar').src = "<%= picture %>";
+
+
+    </script>
+  </body>
+</html>

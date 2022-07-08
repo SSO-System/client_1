@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <%- include('components/head'); -%>
+  <body class="app" style="text-align: center;">
+        <h1><%= title %></h1>
+        <div>          
+          <img src="https://firebasestorage.googleapis.com/v0/b/oauth2-c28ca.appspot.com/o/welcome.png?alt=media&token=a0f871f8-b915-4068-9154-5bba657bc37f" width="30%" height="auto" />
+        </div>
+        <form action="<%= authServerUrl %>/auth" method="post">
+            <input hidden required name="client_id" value="<%= clientId %>" />
+            <input hidden required name="resource" value="<%= appUrl %>/login_callback"/>
+            <input hidden required name="response_type" value="code" />
+            <input hidden required name="redirect_uri" value="<%= appUrl %>/login_callback" />
+            <input hidden required name="scope" value="openid offline_access profile email" />
+            <input hidden required name="prompt" value="consent" />
+            <input hidden id="challengeCodeInput" value="<%= codeChallenge %>" required name="code_challenge" />
+            <input hidden required name="code_challenge_method" value="S256" />
+            <button style="margin-top: 20px;" type="submit" class="login login-submit">
+                Login
+            </button>
+        </form>
+    <script>
+      async function onLogin() {
+      }
+    </script>
+  </body>
+</html>
