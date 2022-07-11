@@ -54,7 +54,6 @@ export default () => ({
           scope: 'openid profile offline_access',
           code_challenge_method: 'S256',
         }));
-
         const userInfo: any = await axios.post(`${process.env.AUTH_ISSUER}/me`, new URLSearchParams({
           access_token: result.data.access_token
         }))
