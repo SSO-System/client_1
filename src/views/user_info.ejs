@@ -46,7 +46,7 @@
           const result = await fetch(`<%= appUrl %>/check_session`, { method: 'GET' });
           const data = await result.json();
           if (data.active) {
-            setTimeout(check_session, 5000);
+            setTimeout(check_session, 8000);
           } else {
             window.location.href = '<%= appUrl %>/logout_callback';
           }
