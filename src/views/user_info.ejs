@@ -44,7 +44,7 @@
       async function check_session() {
         try {
           const result = await fetch(`<%= appUrl %>/check_session`, { method: 'GET' });
-          const data = result.json();
+          const data = await result.json();
           if (data.active) {
             setTimeout(check_session, 3500);
           } else {

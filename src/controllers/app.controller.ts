@@ -52,7 +52,7 @@ export default () => ({
           code: req.query.code,
           redirect_uri: process.env.APP_URL + "/login_callback",
           code_verifier: data.data().codeVerifier,
-          scope: 'openid profile offline_access',
+          scope: 'openid profile',
           code_challenge_method: 'S256',
         }));
         
