@@ -40,7 +40,22 @@
     </div>
     <script>
       document.getElementById('avatar').src = "<%= picture %>";
+      
+      async function check_session() {
+        try {
+          const result = await fetch(`<%= appUrl %>/check_session`, { method: 'GET' });
+          const data = result.json();
+          if (data.active) {
+            setTimeout(check_session, 3500);
+          } else {
+            window.location.href = '<%= appUrl %>/logout_callback';
+          }
+        } catch (e) {
+          console.log(e.message);
+        }
+      }
 
+      check_session();
 
     </script>
   </body>

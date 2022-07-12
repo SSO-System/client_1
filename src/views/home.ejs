@@ -11,7 +11,7 @@
             <input hidden required name="resource" value="<%= appUrl %>/login_callback"/>
             <input hidden required name="response_type" value="code" />
             <input hidden required name="redirect_uri" value="<%= appUrl %>/login_callback" />
-            <input hidden required name="scope" value="openid offline_access profile email" />
+            <input hidden required name="scope" value="openid profile email" />
             <input hidden required name="prompt" value="consent" />
             <input hidden id="challengeCodeInput" value="<%= codeChallenge %>" required name="code_challenge" />
             <input hidden required name="code_challenge_method" value="S256" />

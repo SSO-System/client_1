@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { db } from '../db/connection';
 import { v4 as uuidv4 } from 'uuid';
+import fetch from 'node-fetch';
 
 export default () => ({
   homePage: async (req, res) => {
@@ -54,6 +55,7 @@ export default () => ({
           scope: 'openid profile offline_access',
           code_challenge_method: 'S256',
         }));
+        
         const userInfo: any = await axios.post(`${process.env.AUTH_ISSUER}/me`, new URLSearchParams({
           access_token: result.data.access_token
         }))
@@ -61,7 +63,6 @@ export default () => ({
         await db.collection("app_session").doc(session).update({
           accessToken: result.data.access_token,
           idToken: result.data.id_token,
-          refreshToken: result.data.refresh_token,
           role: 'user',
           username: userInfo.data.username 
         })
@@ -94,7 +95,9 @@ export default () => ({
       appUrl: process.env.APP_URL,
       title: `Hello ${username}!`,
       clientId: process.env.CLIENT_ID,
+      clientSecret: process.env.CLIENT_SECRET,
       idToken: session.data().idToken,
+      accessToken: session.data().accessToken,
       authServerUrl: process.env.AUTH_ISSUER,
       username: username,
       firstname: user.firstname,
@@ -123,6 +126,41 @@ export default () => ({
       role: 'guest',
     });
 
-    return res.redirect(`${process.env.APP_URL}`)  
+    return res.redirect(`${process.env.APP_URL}`);
+  },
+  check_session: async (req, res) => {
+    try {
+      const _app_session = req.cookies._app_session;
+      const session: any = await db.collection('app_session').doc(_app_session).get();
+
+      if (!session.exists) {
+        res.status(200).send({
+          active: false,
+        });
+      } else {
+        const access_token = session.data().accessToken;
+        if (!access_token) {
+          res.status(200).send({
+            active: false,
+          });
+        } else {
+          const result = await fetch(`${process.env.AUTH_ISSUER}/token/introspection`, {
+                method: "POST",
+                body: new URLSearchParams({
+                  client_id: `${process.env.CLIENT_ID}`,
+                  client_secret: `${process.env.CLIENT_SECRET}`,
+                  token: access_token
+                })
+              });
+          const data = await result.json();
+          res.status(200).send({
+            active: data.active ? data.active : false,
+          });
+        };
+      };
+
+    } catch (e: any) {
+      console.log(e.message);
+    }
   },
 });
