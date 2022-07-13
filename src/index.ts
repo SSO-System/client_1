@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import path from "path";
 import router from "./routes";
-import { check_session } from "./middlewares/session.middleware";
+import { session } from "./middlewares/session.middleware";
 import { createCodeChallenge } from "./middlewares/createCodeChanlenge.middleware";
 
 dotenv.config({ path: path.resolve('.env')});
@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(express.static(path.resolve('public')));
 
 // Session + Create Code Challenge middleware
-app.use(check_session, createCodeChallenge);
+app.use(session, createCodeChallenge);
 
 // Routing
 app.use(router());

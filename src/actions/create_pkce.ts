@@ -14,5 +14,5 @@ export const create_pkce = async (session: string) => {
     merge: true
   });
   
-  return codeChallenge;
+  return { codeChallenge, codeVerifier };
 };

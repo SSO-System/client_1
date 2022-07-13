@@ -9,7 +9,6 @@
         </div>
         <form action="<%= authServerUrl %>/auth" method="post">
             <input hidden required name="client_id" value="<%= clientId %>" />
-            <input hidden required name="resource" value="<%= appUrl %>/login_callback"/>
             <input hidden required name="response_type" value="code" />
             <input hidden required name="redirect_uri" value="<%= appUrl %>/login_callback" />
             <input hidden required name="scope" value="openid profile email" />

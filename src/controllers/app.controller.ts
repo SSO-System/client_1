@@ -5,22 +5,16 @@ import fetch from 'node-fetch';
 
 export default () => ({
   homePage: async (req, res) => {
-    if (req.cookies?._app_session !== undefined) {
-      const _app_session = req.cookies._app_session;
-      const session: any = await db.collection('app_session').doc(_app_session).get();
-
-      if (session.exists) {
-        if (session.data().role !== 'guest') {
-          return res.redirect(`${process.env.APP_URL}/me`);
-        }
-      }
+    if (req.session.role !== 'guest') {
+      return res.redirect(`${process.env.APP_URL}/me`);
     }
+    
     return res.render("home", {
       title: "Welcome to Client 1",
       authServerUrl: process.env.AUTH_ISSUER,
       appUrl: process.env.APP_URL,
       clientId: process.env.CLIENT_ID,
-      codeChallenge: res.locals.codeChallenge
+      codeChallenge: req.session.codeChallenge
     });
   },
 
@@ -42,16 +36,13 @@ export default () => ({
         })
       }
       try {
-        const session = req.cookies._app_session;
-        const data: any = await db.collection('app_session').doc(session).get();
-
         const result: any = await axios.post(`${process.env.AUTH_ISSUER}/token`, new URLSearchParams({
           client_id: `${process.env.CLIENT_ID}`,
           client_secret: `${process.env.CLIENT_SECRET}`,
           grant_type: "authorization_code",
           code: req.query.code,
           redirect_uri: process.env.APP_URL + "/login_callback",
-          code_verifier: data.data().codeVerifier,
+          code_verifier: req.session.codeVerifier,
           scope: 'openid profile',
           code_challenge_method: 'S256',
         }));
@@ -60,7 +51,7 @@ export default () => ({
           access_token: result.data.access_token
         }))
 
-        await db.collection("app_session").doc(session).update({
+        await db.collection("app_session").doc(req.sessionID).update({
           accessToken: result.data.access_token,
           idToken: result.data.id_token,
           role: 'user',
@@ -74,7 +65,7 @@ export default () => ({
           await db.collection('app_account').add(userInfo.data);
         }
         
-        return res.redirect(`${process.env.APP_URL}/me`);
+        return res.redirect(req.session.redirect_to ? req.session.redirect_to : `${process.env.APP_URL}/me`);
 
       } catch (e: any) {
         console.log(e.message);
@@ -83,21 +74,18 @@ export default () => ({
   },
   
   user_info: async (req, res) => {
-    const _app_session = req.cookies._app_session;
-
-    const session: any = await db.collection("app_session").doc(_app_session).get();
-    const username: string = session.data().username;
-
+    const username: string = req.session.username;
+    const idToken: string = req.session.idToken;
+    const accessToken: string = req.session.accessToken;
     const userInfo: any = await db.collection("app_account").where("username", "==", username).get();
     const user = userInfo.docs[0].data();
 
     return res.render("user_info", {
+      idToken,
       appUrl: process.env.APP_URL,
       title: `Hello ${username}!`,
       clientId: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
-      idToken: session.data().idToken,
-      accessToken: session.data().accessToken,
       authServerUrl: process.env.AUTH_ISSUER,
       username: username,
       firstname: user.firstname,
@@ -113,7 +101,7 @@ export default () => ({
 
   logout_callback: async (req, res) => {
     const oneDay = 24 * 60 * 60 * 1000;
-    const _app_session = req.cookies._app_session;
+    const _app_session = req.sessionID;
     const new_session = uuidv4();
     res.cookie("_app_session", new_session, {
       httpOnly: true,
@@ -128,37 +116,28 @@ export default () => ({
 
     return res.redirect(`${process.env.APP_URL}`);
   },
+  
   check_session: async (req, res) => {
     try {
-      const _app_session = req.cookies._app_session;
-      const session: any = await db.collection('app_session').doc(_app_session).get();
-
-      if (!session.exists) {
+      const access_token = req.session.accessToken;
+      if (!access_token) {
         res.status(200).send({
           active: false,
         });
       } else {
-        const access_token = session.data().accessToken;
-        if (!access_token) {
-          res.status(200).send({
-            active: false,
-          });
-        } else {
-          const result = await fetch(`${process.env.AUTH_ISSUER}/token/introspection`, {
-                method: "POST",
-                body: new URLSearchParams({
-                  client_id: `${process.env.CLIENT_ID}`,
-                  client_secret: `${process.env.CLIENT_SECRET}`,
-                  token: access_token
-                })
-              });
-          const data = await result.json();
-          res.status(200).send({
-            active: data.active ? data.active : false,
-          });
-        };
+        const result = await fetch(`${process.env.AUTH_ISSUER}/token/introspection`, {
+              method: "POST",
+              body: new URLSearchParams({
+                client_id: `${process.env.CLIENT_ID}`,
+                client_secret: `${process.env.CLIENT_SECRET}`,
+                token: access_token
+              })
+            });
+        const data = await result.json();
+        res.status(200).send({
+          active: data.active ? data.active : false,
+        });
       };
-
     } catch (e: any) {
       console.log(e.message);
     }
