@@ -11,14 +11,6 @@ router.get('/login_callback', login_callback);
 router.get('/me', authenticate, user_info);
 router.get('/logout_callback', authenticate, logout_callback);
 router.get('/check_session', check_session);
-router.get('/check_global_session', async (req, res) => {
-  try {
-    const result = await axios.get(`${process.env.AUTH_ISSUER}/check_session`);
-    res.send(result.data);
-  } catch (e) {
-    console.log(e);
-  }
-});
 
 export default {
   routes: router

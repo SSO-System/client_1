@@ -1,11 +1,11 @@
-import admin from 'firebase-admin';
-import { getFirestore } from 'firebase-admin/firestore';
+import { Pool } from 'pg';
 
-var serviceAccount = require("./firebase_private_key/oauth2-c28ca-firebase-adminsdk-alegi-341ce7fce0.json");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+let pool = new Pool({
+        user: 'sso',
+        host: '42.117.5.115',
+        database: 'INTERN-SSO',
+        password: 'dientoan@123',
+        port: '5432'
 });
 
-export const db = getFirestore();
-
+export const db = pool;

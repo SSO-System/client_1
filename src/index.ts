@@ -12,21 +12,23 @@ dotenv.config({ path: path.resolve('.env')});
 const PORT = process.env.PORT || 3005;
 const app = express();
 
-// Seting 
-app.set('view engine', 'ejs');
-app.set('views', path.resolve(__dirname, './views'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(express.static(path.resolve('public')));
+(async () => {
+  // Seting 
+  app.set('view engine', 'ejs');
+  app.set('views', path.resolve(__dirname, './views'));
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(cookieParser());
+  app.use(express.static(path.resolve('public')));
 
-// Session + Create Code Challenge middleware
-app.use(session, createCodeChallenge);
+  // Session + Create Code Challenge middleware
+  app.use(session, createCodeChallenge);
 
-// Routing
-app.use(router());
+  // Routing
+  app.use(router());
 
-app.listen(PORT, () => {
-  console.log(
-    `App listening on port ${PORT}, check http://localhost:${PORT}`
-  );
-});
+  app.listen(PORT, () => {
+    console.log(
+      `App listening on port ${PORT}, check http://localhost:${PORT}`
+    );
+  });
+})();
