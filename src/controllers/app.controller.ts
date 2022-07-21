@@ -90,12 +90,12 @@ export default () => ({
       clientSecret: process.env.CLIENT_SECRET,
       authServerUrl: process.env.AUTH_ISSUER,
       username: username,
-      firstname: user.firstname,
-      lastname: user.lastname,
+      firstname: user.first_name,
+      lastname: user.last_name,
       birthdate: user.birthdate,
       gender: user.gender,
       picture: user.picture,
-      createdAt: user.createdAt,
+      createdAt: user.created_at,
       email: user.email,
       emailVerified: user.email_verified
     });
