@@ -16,6 +16,24 @@ export default () => ({
       codeChallenge: req.session.code_challenge
     });
   },
+  register: async (req, res) => {
+    console.log("register here")
+    const newUser = req.body;
+    // await db.query(`INSERT INTO client_1_account() VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`, [] )
+    newUser.created_at = (new Date()).toISOString();
+    newUser.birthdate = (new Date(newUser.birthdate).toISOString())
+    console.log(newUser);
+          await db.query(`INSERT INTO client_1_account(username, email, email_verified, 
+                                                      first_name, last_name, gender, picture, 
+                                                      birthdate, created_at, sub)
+                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`, 
+                          [newUser.username, newUser.email, newUser.email_verified, newUser.first_name,
+                          newUser.last_name, newUser.gender, newUser.picture,
+                          newUser.birthdate, newUser.created_at, newUser.sub]);
+    
+    console.log(newUser)
+    return res.status(200).send("end");
+  },
 
   login_callback: async (req, res) => {
     if ("error" in req.query) {
